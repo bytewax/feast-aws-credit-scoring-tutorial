@@ -1,23 +1,21 @@
-resource "aws_s3_bucket" "feast_bucket" {
-  bucket        = "${var.project_name}-bucket"
-  acl           = "private"
-  force_destroy = true
+data "aws_s3_bucket" "feast_bucket" {
+  bucket = "bytewax-feast-bucket"
 }
 
-resource "aws_s3_bucket_object" "zipcode_features_file_upload" {
-  bucket = aws_s3_bucket.feast_bucket.bucket
+resource "aws_s3_object" "zipcode_features_file_upload" {
+  bucket = data.aws_s3_bucket.feast_bucket.bucket
   key    = "zipcode_features/table.parquet"
   source = "${path.module}/../data/zipcode_table.parquet"
 }
 
-resource "aws_s3_bucket_object" "credit_history_file_upload" {
-  bucket = aws_s3_bucket.feast_bucket.bucket
+resource "aws_s3_object" "credit_history_file_upload" {
+  bucket = data.aws_s3_bucket.feast_bucket.bucket
   key    = "credit_history/table.parquet"
   source = "${path.module}/../data/credit_history.parquet"
 }
 
-resource "aws_s3_bucket_object" "loan_features_file_upload" {
-  bucket = aws_s3_bucket.feast_bucket.bucket
+resource "aws_s3_object" "loan_features_file_upload" {
+  bucket = data.aws_s3_bucket.feast_bucket.bucket
   key    = "loan_features/table.parquet"
   source = "${path.module}/../data/loan_table.parquet"
 }
@@ -107,7 +105,7 @@ resource "aws_glue_catalog_table" "zipcode_features_table" {
   }
 
   storage_descriptor {
-    location      = "s3://${aws_s3_bucket.feast_bucket.bucket}/zipcode_features/"
+    location      = "s3://${data.aws_s3_bucket.feast_bucket.bucket}/zipcode_features/"
     input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
     output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
 
@@ -172,7 +170,7 @@ resource "aws_glue_catalog_table" "credit_history_table" {
   }
 
   storage_descriptor {
-    location      = "s3://${aws_s3_bucket.feast_bucket.bucket}/credit_history/"
+    location      = "s3://${data.aws_s3_bucket.feast_bucket.bucket}/credit_history/"
     input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
     output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
 
